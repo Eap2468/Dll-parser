@@ -35,7 +35,7 @@ int main()
     }
     printf("\\__[File Handle]\n\t\\_0x%p\n", hFile);
 
-    if((dwFileSize = GetFileSize(hFile, NULL)) == INVALID_FILE_SIZE)
+    if ((dwFileSize = GetFileSize(hFile, NULL)) == INVALID_FILE_SIZE)
     {
         error("GetFileSize error");
         CloseHandle(hFile);
@@ -44,7 +44,7 @@ int main()
 
     LPBYTE dllInfo = (LPBYTE)VirtualAlloc(NULL, dwFileSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-    if(!ReadFile(hFile, dllInfo, dwFileSize, &dwBytesRead, NULL) || dwBytesRead != dwFileSize)
+    if (!ReadFile(hFile, dllInfo, dwFileSize, &dwBytesRead, NULL) || dwBytesRead != dwFileSize)
     {
         error("ReadFile error");
         CloseHandle(hFile);
@@ -66,7 +66,7 @@ int main()
     ImportDirectory = pNT->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
 
     pSECTION = IMAGE_FIRST_SECTION(pNT);
-    for(int i = 0; i < pNT->FileHeader.NumberOfSections; i++)
+    for (int i = 0; i < pNT->FileHeader.NumberOfSections; i++)
     {
         if (ExportDirectory.VirtualAddress >= pSECTION->VirtualAddress && ExportDirectory.VirtualAddress < pSECTION->VirtualAddress + pSECTION->SizeOfRawData)
         {
@@ -83,13 +83,13 @@ int main()
         pSECTION++;
     }
 
-    if(pIMPORT == nullptr)
+    if (pIMPORT == nullptr)
         printf("\n[*] Dll has no imports\n\n");
     else
     {
         printf("Imports:\n\n");
         pImportDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)(lpBaseAddress + ImportDirectory.VirtualAddress);
-        while(pImportDescriptor->Name != NULL)
+        while (pImportDescriptor->Name != NULL)
         {
             char* library_name = (char*)(lpBaseAddress + pImportDescriptor->Name);
             HMODULE hLibrary = LoadLibraryA(library_name);
@@ -102,18 +102,18 @@ int main()
             }
             printf("\\__[%s]\n", library_name);
             pThunkData = (PIMAGE_THUNK_DATA)(lpBaseAddress + pImportDescriptor->FirstThunk);
-            while(pThunkData->u1.AddressOfData != NULL)
+            while (pThunkData->u1.AddressOfData != NULL)
             {
-                if(IMAGE_SNAP_BY_ORDINAL(pThunkData->u1.Ordinal))
+                if (IMAGE_SNAP_BY_ORDINAL(pThunkData->u1.Ordinal))
                 {
-                    pThunkData->u1.Function = GetProcAddress(hLibrary, MAKEINTRESOURCEA(pThunkData->u1.Ordinal));
+                    pThunkData->u1.Function = (DWORD)GetProcAddress(hLibrary, MAKEINTRESOURCEA(pThunkData->u1.Ordinal));
                     printf("Ordinal: %d", pThunkData->u1.Ordinal);
                 }
                 else
                 {
                     pImportByName = (PIMAGE_IMPORT_BY_NAME)(lpBaseAddress + pThunkData->u1.AddressOfData);
                     printf("\t\\_[%s]\n", (char*)pImportByName->Name);
-                    pThunkData->u1.Function = GetProcAddress(hLibrary, (char*)(pImportByName->Name));
+                    pThunkData->u1.Function = (DWORD)GetProcAddress(hLibrary, (char*)(pImportByName->Name));
                 }
                 pThunkData++;
             }
@@ -129,12 +129,12 @@ int main()
     {
         printf("\nExports:\n\n");
         pExportTable = (PIMAGE_EXPORT_DIRECTORY)(lpBaseAddress + ExportDirectory.VirtualAddress);
-    
+
         pFunctionAddress = (PDWORD)(lpBaseAddress + pExportTable->AddressOfFunctions);
         pNamesAddress = (PDWORD)(lpBaseAddress + pExportTable->AddressOfNames);
         pOrdinalNamesAddress = (PWORD)(lpBaseAddress + pExportTable->AddressOfNameOrdinals);
-    
-        for(int i = 0; i < pExportTable->NumberOfNames; i++)
+
+        for (int i = 0; i < pExportTable->NumberOfNames; i++)
         {
             char* function_name = (char*)(lpBaseAddress + pNamesAddress[i]);
             dwAddressLocation = (DWORD)(lpBaseAddress + pFunctionAddress[pOrdinalNamesAddress[i]]);
