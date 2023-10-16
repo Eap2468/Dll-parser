@@ -83,14 +83,6 @@ int main()
         pSECTION++;
     }
 
-    if (pEXPORT == nullptr)
-    {
-        error("Error getting section headers");
-        VirtualFree(dllInfo, 0, MEM_RELEASE);
-        VirtualFree(lpBaseAddress, 0, MEM_RELEASE);
-        return 0;
-    }
-
     if(pIMPORT == nullptr)
         printf("\n[*] Dll has no imports\n\n");
     else
@@ -129,18 +121,25 @@ int main()
         }
     }
 
-    printf("\nExports:\n\n");
-    pExportTable = (PIMAGE_EXPORT_DIRECTORY)(lpBaseAddress + ExportDirectory.VirtualAddress);
-
-    pFunctionAddress = (PDWORD)(lpBaseAddress + pExportTable->AddressOfFunctions);
-    pNamesAddress = (PDWORD)(lpBaseAddress + pExportTable->AddressOfNames);
-    pOrdinalNamesAddress = (PWORD)(lpBaseAddress + pExportTable->AddressOfNameOrdinals);
-
-    for(int i = 0; i < pExportTable->NumberOfNames; i++)
+    if (pEXPORT == nullptr)
     {
-        char* function_name = (char*)(lpBaseAddress + pNamesAddress[i]);
-        dwAddressLocation = (DWORD)(lpBaseAddress + pFunctionAddress[pOrdinalNamesAddress[i]]);
-        printf("\\__[%s]\n\t\\_0x%x\n", function_name, dwAddressLocation);
+        printf("No exports found");
+    }
+    else
+    {
+        printf("\nExports:\n\n");
+        pExportTable = (PIMAGE_EXPORT_DIRECTORY)(lpBaseAddress + ExportDirectory.VirtualAddress);
+    
+        pFunctionAddress = (PDWORD)(lpBaseAddress + pExportTable->AddressOfFunctions);
+        pNamesAddress = (PDWORD)(lpBaseAddress + pExportTable->AddressOfNames);
+        pOrdinalNamesAddress = (PWORD)(lpBaseAddress + pExportTable->AddressOfNameOrdinals);
+    
+        for(int i = 0; i < pExportTable->NumberOfNames; i++)
+        {
+            char* function_name = (char*)(lpBaseAddress + pNamesAddress[i]);
+            dwAddressLocation = (DWORD)(lpBaseAddress + pFunctionAddress[pOrdinalNamesAddress[i]]);
+            printf("\\__[%s]\n\t\\_0x%x\n", function_name, dwAddressLocation);
+        }
     }
 
     VirtualFree(dllInfo, 0, MEM_RELEASE);
