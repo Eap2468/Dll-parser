@@ -12,7 +12,7 @@ DWORD GetImageSize(LPBYTE dllbase)
 
 int main()
 {
-    const char* file_path = "C:\\windows\\system32\\kernel32.dll";
+    const char* file_path = "C:\\windows\\system32\\taskmgr.exe";
 
     HANDLE hFile;
     DWORD dwFileSize, dwBytesRead, dwImageSize, dwAddressLocation;
@@ -107,7 +107,7 @@ int main()
                 if (IMAGE_SNAP_BY_ORDINAL(pThunkData->u1.Ordinal))
                 {
                     pThunkData->u1.Function = (DWORD)GetProcAddress(hLibrary, MAKEINTRESOURCEA(pThunkData->u1.Ordinal));
-                    printf("Ordinal: %d", pThunkData->u1.Ordinal);
+                    printf("Ordinal: %d\n", pThunkData->u1.Ordinal);
                 }
                 else
                 {
