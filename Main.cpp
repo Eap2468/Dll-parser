@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <iostream>
 #include <windows.h>
 
 #pragma warning(disable : 4244)
@@ -120,7 +119,7 @@ int main()
                 if(!IMAGE_ORDINAL(pThunkData->u1.Ordinal))
                 {
                     pThunkData->u1.Function = GetProcAddress(hLibrary, MAKEINTRESOURCEA(pThunkData->u1.Ordinal));
-                    std::cout << "Ordinal: " << pThunkData->u1.Ordinal << std::endl;
+                    printf("Ordinal: %d", pThunkData->u1.Ordinal);
                 }
                 else
                 {
