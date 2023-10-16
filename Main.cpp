@@ -92,9 +92,7 @@ int main()
     }
 
     if(pIMPORT == nullptr)
-    {
         printf("\n[*] Dll has no imports\n\n");
-    }
     else
     {
         printf("Imports:\n\n");
