@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
 
-#pragma warning(disable : 4244)
-
 #define error(str) printf("[-] %s: %d", str, GetLastError())
 
 DWORD GetImageSize(LPBYTE dllbase)
