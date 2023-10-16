@@ -104,7 +104,7 @@ int main()
             pThunkData = (PIMAGE_THUNK_DATA)(lpBaseAddress + pImportDescriptor->FirstThunk);
             while(pThunkData->u1.AddressOfData != NULL)
             {
-                if(!IMAGE_ORDINAL(pThunkData->u1.Ordinal))
+                if(IMAGE_SNAP_BY_ORDINAL(pThunkData->u1.Ordinal))
                 {
                     pThunkData->u1.Function = GetProcAddress(hLibrary, MAKEINTRESOURCEA(pThunkData->u1.Ordinal));
                     printf("Ordinal: %d", pThunkData->u1.Ordinal);
